@@ -2,7 +2,7 @@ services:
   - type: web
     name: contextslim
     env: python
-    buildCommand: pip install -r requirements.txt && python -c "from contextslim.embeddings import EmbeddingService; EmbeddingService.create('local', 'all-MiniLM-L6-v2').embed('warmup')"
+    buildCommand: pip install -r requirements-render.txt && python -c "from contextslim.embeddings import EmbeddingService; EmbeddingService.create('local', 'all-MiniLM-L6-v2').embed('warmup')"
     startCommand: python -m contextslim.app
     envVars:
       - key: PYTHON_VERSION
