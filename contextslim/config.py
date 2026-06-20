@@ -21,6 +21,7 @@ class Config:
             "all-MiniLM-L6-v2",
         )
         self.api_key = os.getenv("CONTEXTSLIM_API_KEY", "")
+        self.admin_api_key = os.getenv("CONTEXTSLIM_ADMIN_KEY", "")
         self.host = os.getenv("HOST", "0.0.0.0")
         self.port = int(os.getenv("PORT", "8000"))
         self.refresh_interval = int(

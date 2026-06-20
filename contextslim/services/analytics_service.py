@@ -21,6 +21,9 @@ class AnalyticsService:
         tool_candidates: int,
         tools_returned: int,
         tool_selected: Optional[str] = None,
+        user_email: Optional[str] = None,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None,
     ):
         conn = self._get_conn()
         conn.execute(
@@ -30,10 +33,20 @@ class AnalyticsService:
             """,
             (query, tool_candidates, tools_returned, tool_selected),
         )
+        self._log_audit(conn, user_id, user_email, session_id, "search", {
+            "query": query, "candidates": tool_candidates, "returned": tools_returned
+        })
         conn.commit()
         conn.close()
 
-    def log_tool_usage(self, tool_id: str, success: bool = True):
+    def log_tool_usage(
+        self,
+        tool_id: str,
+        success: bool = True,
+        user_email: Optional[str] = None,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+    ):
         conn = self._get_conn()
         conn.execute(
             """
@@ -46,8 +59,28 @@ class AnalyticsService:
             """,
             (tool_id, 1 if success else 0, 1 if success else 0),
         )
+        self._log_audit(conn, user_id, user_email, session_id, "tool_usage", {
+            "tool_id": tool_id, "success": success
+        })
         conn.commit()
         conn.close()
+
+    def _log_audit(
+        self,
+        conn: sqlite3.Connection,
+        user_id: Optional[str],
+        user_email: Optional[str],
+        session_id: Optional[str],
+        action: str,
+        details: dict,
+    ):
+        conn.execute(
+            """
+            INSERT INTO audit_log (user_id, user_email, session_id, action, details)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (user_id, user_email, session_id, action, str(details)),
+        )
 
     def get_usage_frequency(self, tool_id: str) -> float:
         conn = self._get_conn()
@@ -85,3 +118,48 @@ class AnalyticsService:
         ).fetchall()
         conn.close()
         return [dict(r) for r in rows]
+
+    def get_audit_log(
+        self,
+        limit: int = 20,
+        user_email: Optional[str] = None,
+        action: Optional[str] = None,
+    ) -> list[dict]:
+        conn = self._get_conn()
+        query = "SELECT * FROM audit_log WHERE 1=1"
+        params = []
+        if user_email:
+            query += " AND user_email = ?"
+            params.append(user_email)
+        if action:
+            query += " AND action = ?"
+            params.append(action)
+        query += " ORDER BY timestamp DESC LIMIT ?"
+        params.append(limit)
+        rows = conn.execute(query, params).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    def get_user_usage(
+        self, user_email: str
+    ) -> dict:
+        conn = self._get_conn()
+        searches = conn.execute(
+            "SELECT COUNT(*) as cnt FROM audit_log WHERE user_email = ? AND action = 'search'",
+            (user_email,),
+        ).fetchone()
+        tool_uses = conn.execute(
+            "SELECT COUNT(*) as cnt FROM audit_log WHERE user_email = ? AND action = 'tool_usage'",
+            (user_email,),
+        ).fetchone()
+        last_active = conn.execute(
+            "SELECT MAX(timestamp) as ts FROM audit_log WHERE user_email = ?",
+            (user_email,),
+        ).fetchone()
+        conn.close()
+        return {
+            "user_email": user_email,
+            "total_searches": searches["cnt"] if searches else 0,
+            "total_tool_uses": tool_uses["cnt"] if tool_uses else 0,
+            "last_active": last_active["ts"] if last_active and last_active["ts"] else None,
+        }
