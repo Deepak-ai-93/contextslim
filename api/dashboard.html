@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContextSlim Admin Dashboard</title>
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #0f172a;
+      --bg-card: rgba(15, 23, 42, 0.45);
+      --bg-card-hover: rgba(15, 23, 42, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(167, 139, 250, 0.5);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #a78bfa; /* Glowing Purple */
+      --accent-primary-hover: #c084fc;
+      --accent-primary-glow: rgba(167, 139, 250, 0.15);
+      --accent-secondary: #22d3ee; /* Glowing Cyan */
+      --accent-secondary-glow: rgba(34, 211, 238, 0.15);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(167, 139, 250, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(34, 211, 238, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Layout structure */
+    header {
+      background: rgba(10, 14, 23, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 2.25rem;
+      height: 2.25rem;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 0 15px var(--accent-primary-glow);
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--success-glow);
+      color: var(--success);
+      padding: 0.35rem 0.75rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.8s infinite;
+    }
+
+    .btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #0a0e17;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary-hover);
+      border-color: var(--accent-primary-hover);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem 1.5rem;
+    }
+
+    /* Grid layout for analytics stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-top: 0.25rem;
+    }
+
+    .stat-icon {
+      color: var(--accent-primary);
+    }
+
+    /* Two column grid */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar components */
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .panel-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .client-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .client-item {
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .client-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .client-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .client-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .client-ver {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      color: var(--text-secondary);
+    }
+
+    .client-details {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* Main content view (Tabs & tables) */
+    .view-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 0.75rem 0.25rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      position: relative;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .tab.active {
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+    }
+
+    .search-filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-input-wrapper i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(10, 14, 23, 0.5);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      border-radius: 0.5rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 10px rgba(167, 139, 250, 0.1);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      padding: 0.85rem 1rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr {
+      transition: background-color 0.15s ease;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.015);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-role-admin {
+      background: rgba(167, 139, 250, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+
+    .badge-role-user {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-failed {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    .badge-action {
+      background: rgba(34, 211, 238, 0.1);
+      color: var(--accent-secondary);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+    }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      width: 90%;
+      max-width: 600px;
+      padding: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    /* Lock Screen Modal */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    .auth-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 420px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .auth-input-wrapper {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: rgba(10, 14, 23, 0.8);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .auth-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .auth-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      min-height: 1.25rem;
+    }
+
+    /* Key-Value grid for user details */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .details-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .details-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .details-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+      border-radius: 3px;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    .loader {
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent-primary);
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spin-anim {
+      animation: spin 1s linear infinite;
+    }
+
+    .no-data {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 3rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth/Lock Screen -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="brand-logo" style="margin: 0 auto 1.5rem auto; width: 3.5rem; height: 3.5rem; font-size: 1.5rem;">C</div>
+      <h2 class="auth-title">ContextSlim Console</h2>
+      <p class="auth-subtitle">Verify your administrator credentials</p>
+      
+      <div class="auth-input-wrapper">
+        <label for="adminKeyInput" style="font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);">ADMIN API KEY</label>
+        <input type="password" id="adminKeyInput" class="auth-input" placeholder="••••••••••••••••">
+      </div>
+      
+      <button id="authBtn" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1rem; padding: 0.75rem;">Unlock Console</button>
+      <div id="authError" class="auth-error"></div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">C</div>
+      <h1 class="brand-name">ContextSlim Router</h1>
+    </div>
+    
+    <div class="header-actions">
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span>Live Router Active</span>
+      </div>
+      <button id="refreshBtn" class="btn">
+        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+        <span>Refresh</span>
+      </button>
+      <button id="lockBtn" class="btn">
+        <i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+        <span>Lock</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>Active Users</span>
+          <i data-lucide="users" class="stat-icon" style="width: 18px; height: 18px;"></i>
+        </div>
+        <div id="statTotalUsers" class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>MCP Client Connections</span>
+          <i data-lucide="terminal" class="stat-icon" style="width: 18px; height: 18px; color: var(--accent-secondary);"></i>
+        </div>
+        <div id="statActiveClients" class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>Total Routing Searches</span>
+          <i data-lucide="search" class="stat-icon" style="width: 18px; height: 18px; color: var(--success);"></i>
+        </div>
+        <div id="statTotalSearches" class="stat-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>Total Tool Executions</span>
+          <i data-lucide="activity" class="stat-icon" style="width: 18px; height: 18px; color: var(--warning);"></i>
+        </div>
+        <div id="statTotalToolRuns" class="stat-value">0</div>
+      </div>
+    </div>
+
+    <!-- Layout Columns -->
+    <div class="dashboard-layout">
+      <!-- Left sidebar: connected clients & top tools -->
+      <div class="sidebar-panel">
+        <div class="panel-card">
+          <h3 class="panel-title">
+            <i data-lucide="plug" style="width: 18px; height: 18px; color: var(--accent-secondary);"></i>
+            <span>Connected Clients</span>
+          </h3>
+          <div id="mcpClientList" class="client-list">
+            <!-- Rendered in JS -->
+            <div class="no-data">No clients connected.</div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h3 class="panel-title">
+            <i data-lucide="zap" style="width: 18px; height: 18px; color: var(--warning);"></i>
+            <span>Top Used Tools</span>
+          </h3>
+          <div id="topToolsList" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Rendered in JS -->
+            <div class="no-data">No tool runs logged.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right main view: Tabs -->
+      <div class="view-panel">
+        <div class="tabs">
+          <button class="tab active" data-tab="users">Users & Usage</button>
+          <button class="tab" data-tab="searches">Routing History</button>
+          <button class="tab" data-tab="audit">Audit Logs</button>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="search-filter-bar">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+            <input type="text" id="tabSearchInput" class="search-input" placeholder="Search tables...">
+          </div>
+        </div>
+
+        <!-- Tables containers -->
+        <div class="table-container">
+          <!-- Users table -->
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>User Details</th>
+                <th>Role</th>
+                <th>Created At</th>
+                <th>Last Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- JS rendered -->
+            </tbody>
+          </table>
+
+          <!-- Searches table -->
+          <table id="searchesTable" style="display: none;">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Query</th>
+                <th>Matches</th>
+                <th>Activated Tool</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="searchesTableBody">
+              <!-- JS rendered -->
+            </tbody>
+          </table>
+
+          <!-- Audit Log table -->
+          <table id="auditTable" style="display: none;">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <!-- JS rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- User Details Modal -->
+  <div id="userModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalUserName">User Usage Report</h3>
+        <button id="modalCloseBtn" class="modal-close">&times;</button>
+      </div>
+      
+      <div id="modalLoading" style="text-align: center; padding: 2rem;">
+        <span class="loader"></span>
+        <p style="margin-top: 1rem; color: var(--text-muted);">Fetching usage report...</p>
+      </div>
+      
+      <div id="modalContent" style="display: none;">
+        <div class="details-grid">
+          <div class="details-item">
+            <span class="details-label">Email</span>
+            <span id="modalUserEmail" class="details-value">email@example.com</span>
+          </div>
+          <div class="details-item">
+            <span class="details-label">Role</span>
+            <span id="modalUserRole" class="details-value">User</span>
+          </div>
+          <div class="details-item">
+            <span class="details-label">Joined</span>
+            <span id="modalUserJoined" class="details-value">2026-06-20</span>
+          </div>
+          <div class="details-item">
+            <span class="details-label">Last Active</span>
+            <span id="modalUserActive" class="details-value">Just now</span>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+          <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Routing Usage Breakdown</h4>
+          
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.35rem;">
+                <span>Total Semantic Queries</span>
+                <span id="modalSearchesCount" style="font-weight: 600;">0</span>
+              </div>
+              <div class="progress-bar-container">
+                <div id="modalSearchesBar" class="progress-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.35rem;">
+                <span>Total Tool Usage Executions</span>
+                <span id="modalToolsCount" style="font-weight: 600;">0</span>
+              </div>
+              <div class="progress-bar-container">
+                <div id="modalToolsBar" class="progress-bar" style="width: 0%; background: linear-gradient(to right, var(--accent-secondary), var(--success));"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    let state = {
+      adminKey: localStorage.getItem('contextslim_admin_key') || '',
+      currentTab: 'users',
+      data: null,
+      searchQuery: '',
+    };
+
+    // DOM Elements
+    const authOverlay = document.getElementById('authOverlay');
+    const adminKeyInput = document.getElementById('adminKeyInput');
+    const authBtn = document.getElementById('authBtn');
+    const authError = document.getElementById('authError');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const lockBtn = document.getElementById('lockBtn');
+    const tabSearchInput = document.getElementById('tabSearchInput');
+    const userModal = document.getElementById('userModal');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    // Initialize lucide icons
+    function initIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    // Check auth on load
+    window.addEventListener('DOMContentLoaded', () => {
+      initIcons();
+      if (state.adminKey) {
+        // test auth by loading stats
+        loadDashboardData(true);
+      } else {
+        authOverlay.classList.remove('hidden');
+      }
+    });
+
+    // Handle authentication UI
+    authBtn.addEventListener('click', () => {
+      const key = adminKeyInput.value.trim();
+      if (!key) {
+        authError.textContent = 'Please enter an admin key.';
+        return;
+      }
+      state.adminKey = key;
+      loadDashboardData(false, (success) => {
+        if (success) {
+          localStorage.setItem('contextslim_admin_key', key);
+          authOverlay.classList.add('hidden');
+          authError.textContent = '';
+        } else {
+          authError.textContent = 'Invalid credentials or connection error.';
+          state.adminKey = '';
+        }
+      });
+    });
+
+    adminKeyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') authBtn.click();
+    });
+
+    lockBtn.addEventListener('click', () => {
+      localStorage.removeItem('contextslim_admin_key');
+      state.adminKey = '';
+      authOverlay.classList.remove('hidden');
+      adminKeyInput.value = '';
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      const refreshIcon = refreshBtn.querySelector('i');
+      if (refreshIcon) refreshIcon.classList.add('spin-anim');
+      loadDashboardData(true, () => {
+        if (refreshIcon) refreshIcon.classList.remove('spin-anim');
+      });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        state.currentTab = e.target.dataset.tab;
+        
+        // Toggle tables
+        document.getElementById('usersTable').style.display = state.currentTab === 'users' ? 'table' : 'none';
+        document.getElementById('searchesTable').style.display = state.currentTab === 'searches' ? 'table' : 'none';
+        document.getElementById('auditTable').style.display = state.currentTab === 'audit' ? 'table' : 'none';
+        
+        // Reset search input
+        tabSearchInput.value = '';
+        state.searchQuery = '';
+        
+        renderCurrentTab();
+      });
+    });
+
+    // Table search filter
+    tabSearchInput.addEventListener('input', (e) => {
+      state.searchQuery = e.target.value.toLowerCase().trim();
+      renderCurrentTab();
+    });
+
+    // Fetch dashboard stats from api
+    function loadDashboardData(hideAuthOverlayOnSuccess = false, callback = null) {
+      const url = `/api/admin/stats?admin_key=${encodeURIComponent(state.adminKey)}`;
+      
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error('Unauthorized');
+          return res.json();
+        })
+        .then(data => {
+          state.data = data;
+          if (hideAuthOverlayOnSuccess) {
+            authOverlay.classList.add('hidden');
+          }
+          
+          updateOverviewStats();
+          updateSidebar();
+          renderCurrentTab();
+          
+          if (callback) callback(true);
+        })
+        .catch(err => {
+          console.error(err);
+          if (callback) callback(false);
+          if (!hideAuthOverlayOnSuccess) {
+            authOverlay.classList.remove('hidden');
+          }
+        });
+    }
+
+    // Update stats cards
+    function updateOverviewStats() {
+      if (!state.data) return;
+      document.getElementById('statTotalUsers').textContent = state.data.total_users || 0;
+      document.getElementById('statActiveClients').textContent = state.data.connected_clients ? state.data.connected_clients.length : 0;
+      document.getElementById('statTotalSearches').textContent = state.data.total_searches || 0;
+      document.getElementById('statTotalToolRuns').textContent = state.data.total_tool_runs || 0;
+    }
+
+    // Update Sidebar: active clients & top tools
+    function updateSidebar() {
+      if (!state.data) return;
+
+      // 1. Render MCP client list
+      const clientList = document.getElementById('mcpClientList');
+      if (state.data.connected_clients && state.data.connected_clients.length > 0) {
+        clientList.innerHTML = state.data.connected_clients.map(c => {
+          const formattedTime = formatTimestamp(c.timestamp);
+          return `
+            <div class="client-item">
+              <div class="client-header">
+                <span class="client-name">${escapeHTML(c.client_name)}</span>
+                <span class="client-ver">v${escapeHTML(c.client_version)}</span>
+              </div>
+              <div class="client-details">
+                <span>IP: ${escapeHTML(c.ip)}</span>
+                <span>${formattedTime}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        clientList.innerHTML = '<div class="no-data">No clients connected.</div>';
+      }
+
+      // 2. Render top tools list
+      const topTools = document.getElementById('topToolsList');
+      if (state.data.top_tools && state.data.top_tools.length > 0) {
+        topTools.innerHTML = state.data.top_tools.map(t => {
+          const successPct = t.usage_count > 0 ? Math.round((t.success_count / t.usage_count) * 100) : 0;
+          return `
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span style="font-weight: 600; font-family: monospace; color: var(--accent-primary);">${escapeHTML(t.tool_id)}</span>
+                <span style="color: var(--text-secondary);">${t.usage_count} runs (${successPct}% success)</span>
+              </div>
+              <div class="progress-bar-container" style="height: 4px;">
+                <div class="progress-bar" style="width: ${successPct}%; background: ${successPct > 80 ? 'var(--success)' : 'var(--warning)'};"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        topTools.innerHTML = '<div class="no-data">No tool runs logged.</div>';
+      }
+    }
+
+    // Render current active tab table
+    function renderCurrentTab() {
+      if (!state.data) return;
+
+      const q = state.searchQuery;
+
+      if (state.currentTab === 'users') {
+        const body = document.getElementById('usersTableBody');
+        let filtered = state.data.users || [];
+        if (q) {
+          filtered = filtered.filter(u => 
+            u.email.toLowerCase().includes(q) || 
+            u.name.toLowerCase().includes(q)
+          );
+        }
+
+        if (filtered.length === 0) {
+          body.innerHTML = `<tr><td colspan="5" class="no-data">No matching users found.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = filtered.map(u => `
+          <tr>
+            <td>
+              <div style="font-weight: 600;">${escapeHTML(u.name)}</div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHTML(u.email)}</div>
+            </td>
+            <td>
+              <span class="badge badge-role-${u.role === 'admin' ? 'admin' : 'user'}">${escapeHTML(u.role)}</span>
+            </td>
+            <td>${formatTimestamp(u.created_at)}</td>
+            <td>${u.last_active ? formatTimestamp(u.last_active) : 'Never'}</td>
+            <td>
+              <button class="btn" onclick="openUserModal('${escapeHTML(u.email)}')">
+                <i data-lucide="bar-chart-3" style="width: 14px; height: 14px;"></i>
+                <span>Usage</span>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+      } else if (state.currentTab === 'searches') {
+        const body = document.getElementById('searchesTableBody');
+        let filtered = state.data.recent_searches || [];
+        if (q) {
+          filtered = filtered.filter(s => 
+            s.query.toLowerCase().includes(q) || 
+            (s.tool_selected && s.tool_selected.toLowerCase().includes(q))
+          );
+        }
+
+        if (filtered.length === 0) {
+          body.innerHTML = `<tr><td colspan="5" class="no-data">No routing history found.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = filtered.map(s => `
+          <tr>
+            <td style="white-space: nowrap; color: var(--text-secondary);">${formatTimestamp(s.timestamp)}</td>
+            <td><code style="background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 0.25rem;">${escapeHTML(s.query)}</code></td>
+            <td>${s.tools_returned} of ${s.tool_candidates}</td>
+            <td style="color: var(--accent-primary); font-family: monospace;">${s.tool_selected ? escapeHTML(s.tool_selected) : '<span style="color: var(--text-muted);">None</span>'}</td>
+            <td>
+              <span class="badge ${s.success ? 'badge-success' : 'badge-failed'}">
+                ${s.success ? 'Success' : 'Failed'}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+
+      } else if (state.currentTab === 'audit') {
+        const body = document.getElementById('auditTableBody');
+        let filtered = state.data.audit_log || [];
+        if (q) {
+          filtered = filtered.filter(a => 
+            (a.user_email && a.user_email.toLowerCase().includes(q)) || 
+            a.action.toLowerCase().includes(q) ||
+            (a.details && a.details.toLowerCase().includes(q))
+          );
+        }
+
+        if (filtered.length === 0) {
+          body.innerHTML = `<tr><td colspan="5" class="no-data">No matching audit logs found.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = filtered.map(a => `
+          <tr>
+            <td style="white-space: nowrap; color: var(--text-secondary);">${formatTimestamp(a.timestamp)}</td>
+            <td>${a.user_email ? escapeHTML(a.user_email) : '<span style="color: var(--text-muted);">System</span>'}</td>
+            <td><span class="badge badge-action">${escapeHTML(a.action)}</span></td>
+            <td style="max-width: 350px; font-family: monospace; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHTML(a.details)}">
+              ${escapeHTML(a.details)}
+            </td>
+            <td>
+              <span class="badge ${a.success ? 'badge-success' : 'badge-failed'}">
+                ${a.success ? 'OK' : 'ERR'}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      initIcons();
+    }
+
+    // Modal Control: Fetch user stats and open modal
+    window.openUserModal = function(email) {
+      userModal.classList.add('active');
+      const content = document.getElementById('modalContent');
+      const loader = document.getElementById('modalLoading');
+      content.style.display = 'none';
+      loader.style.display = 'block';
+
+      const url = `/api/admin/user-report?email=${encodeURIComponent(email)}&admin_key=${encodeURIComponent(state.adminKey)}`;
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch user report');
+          return res.json();
+        })
+        .then(data => {
+          loader.style.display = 'none';
+          content.style.display = 'block';
+
+          document.getElementById('modalUserName').textContent = `${escapeHTML(data.name || 'User')}'s Dashboard Usage`;
+          document.getElementById('modalUserEmail').textContent = escapeHTML(data.user_email);
+          document.getElementById('modalUserRole').textContent = escapeHTML(data.role || 'user');
+          document.getElementById('modalUserJoined').textContent = data.created_at ? formatTimestamp(data.created_at) : 'N/A';
+          document.getElementById('modalUserActive').textContent = data.last_active ? formatTimestamp(data.last_active) : 'N/A';
+
+          document.getElementById('modalSearchesCount').textContent = data.total_searches || 0;
+          document.getElementById('modalToolsCount').textContent = data.total_tool_uses || 0;
+
+          // compute progress bars (cap at 100 relative to a logical baseline, e.g. 50 searches, 50 tool uses)
+          const searchesPercent = Math.min(100, Math.round(((data.total_searches || 0) / 100) * 100));
+          const toolsPercent = Math.min(100, Math.round(((data.total_tool_uses || 0) / 100) * 100));
+
+          document.getElementById('modalSearchesBar').style.width = `${searchesPercent}%`;
+          document.getElementById('modalToolsBar').style.width = `${toolsPercent}%`;
+        })
+        .catch(err => {
+          console.error(err);
+          loader.innerHTML = `<p style="color: var(--danger);">Failed to load user report. Try again.</p>`;
+        });
+    };
+
+    modalCloseBtn.addEventListener('click', () => {
+      userModal.classList.remove('active');
+    });
+
+    userModal.addEventListener('click', (e) => {
+      if (e.target === userModal) userModal.classList.remove('active');
+    });
+
+    // Utility: Format DB timestamp
+    function formatTimestamp(timestampStr) {
+      if (!timestampStr) return '';
+      try {
+        let standardStr = timestampStr;
+        if (timestampStr.indexOf(' ') === 10 && timestampStr.indexOf('+') === -1 && timestampStr.indexOf('Z') === -1) {
+          standardStr = timestampStr.replace(' ', 'T') + 'Z';
+        }
+        const d = new Date(standardStr);
+        if (isNaN(d.getTime())) return timestampStr;
+        
+        return d.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      } catch (e) {
+        return timestampStr;
+      }
+    }
+
+    // Utility: escape HTML
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
