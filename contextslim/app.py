@@ -83,8 +83,8 @@ def explain_routing_decision(
 
 
 @mcp.tool()
-def refresh_catalog() -> str:
-    asyncio.run(indexing_service.index_all())
+async def refresh_catalog() -> str:
+    await indexing_service.index_all()
     count = catalog.get_tool_count()
     return json.dumps({"status": "ok", "tools_indexed": count})
 

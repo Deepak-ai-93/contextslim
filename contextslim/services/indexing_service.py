@@ -115,17 +115,20 @@ class IndexingService:
 
     def _index_demo_tools(self):
         self.catalog.clear_all()
+        texts = []
+        tool_index = []
         for server_data in DEMO_TOOLS:
             server_name = server_data["server"]
             for tool in server_data["tools"]:
-                self._index_tool(
-                    server_name,
-                    {
-                        "name": tool["name"],
-                        "description": tool["description"],
-                        "schema_json": '{"type":"object","properties":{}}',
-                    },
-                )
+                texts.append(f"{tool['name']}: {tool['description']}")
+                tool_index.append((server_name, tool))
+        embeddings = self.embeddings.embed_batch(texts)
+        for (server_name, tool), embedding in zip(tool_index, embeddings):
+            self._index_tool(server_name, {
+                "name": tool["name"],
+                "description": tool["description"],
+                "schema_json": '{"type":"object","properties":{}}',
+            }, embedding=embedding)
         count = self.catalog.get_tool_count()
         logger.info("Indexed %d demo tools", count)
 
@@ -133,13 +136,15 @@ class IndexingService:
         self,
         server_name: str,
         tool_data: dict,
+        embedding: Optional[list[float]] = None,
     ):
         tool_name = tool_data.get("name", "unknown")
         description = tool_data.get("description") or ""
         schema_json = tool_data.get("schema_json") or "{}"
         tool_id = f"{server_name}.{tool_name}"
-        text_for_embedding = f"{tool_name}: {description}"
-        embedding = self.embeddings.embed(text_for_embedding)
+        if embedding is None:
+            text_for_embedding = f"{tool_name}: {description}"
+            embedding = self.embeddings.embed(text_for_embedding)
         self.catalog.upsert_tool(
             tool_id=tool_id,
             server_name=server_name,
