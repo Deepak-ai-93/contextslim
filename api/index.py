@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 os.environ["CONTEXTSLIM_EMBEDDING_PROVIDER"] = "openai"
+os.environ["CONTEXTSLIM_DB_PATH"] = "/tmp/contextslim.db"
 
 from contextslim import app as contextslim_app
 
