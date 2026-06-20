@@ -18,12 +18,12 @@ async def root(request):
     return JSONResponse({
         "service": "ContextSlim Router",
         "status": "ok",
-        "mcp_endpoint": "POST /mcp",
+        "mcp_endpoint": "/mcp",
         "docs": "https://github.com/Deepak-ai-93/contextslim",
     })
 
 
-app = contextslim_app.mcp.http_app(transport="streamable-http", stateless_http=True)
+app = contextslim_app.mcp.http_app(transport="streamable-http")
 app.add_route("/", root)
 app.add_route("/health", root)
 app.add_middleware(
