@@ -25,8 +25,9 @@ python -m contextslim.app
 1. Push this repo to GitHub
 2. In Vercel, import the repo
 3. Vercel will auto-detect `vercel.json`
-4. Requires **Pro plan** (Hobby plan has 50MB function limit; Python deps exceed this)
-5. Uses Streamable HTTP transport (no persistent SSE connections)
+4. Set environment variable `OPENAI_API_KEY` in Vercel dashboard
+5. Uses **OpenAI embeddings** (text-embedding-3-small) — no ML model bundle needed
+6. Uses Streamable HTTP transport (no persistent SSE connections)
 
 ## Configuration
 
@@ -34,7 +35,9 @@ python -m contextslim.app
 |----------|---------|-------------|
 | `CONTEXTSLIM_DB_PATH` | `contextslim/database/contextslim.db` | SQLite database path |
 | `CONTEXTSLIM_SERVERS_PATH` | `contextslim/mcp_servers/config.json` | MCP server config path |
+| `CONTEXTSLIM_EMBEDDING_PROVIDER` | `local` | `local` (sentence-transformers) or `openai` (API) |
 | `CONTEXTSLIM_EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence transformer model |
+| `OPENAI_API_KEY` | `` | Required when provider is `openai` |
 | `CONTEXTSLIM_API_KEY` | `` | Optional API key |
 | `CONTEXTSLIM_TOP_K` | `20` | Max tools to return per search |
 | `CONTEXTSLIM_REFRESH_INTERVAL` | `300` | Index refresh interval in seconds |

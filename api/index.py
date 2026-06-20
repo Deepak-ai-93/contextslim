@@ -1,8 +1,11 @@
 import asyncio
 import logging
+import os
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
+
+os.environ["CONTEXTSLIM_EMBEDDING_PROVIDER"] = "openai"
 
 from contextslim import app as contextslim_app
 

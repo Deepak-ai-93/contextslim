@@ -13,6 +13,9 @@ class Config:
             "CONTEXTSLIM_SERVERS_PATH",
             str(base / "mcp_servers" / "config.json"),
         )
+        self.embedding_provider = os.getenv(
+            "CONTEXTSLIM_EMBEDDING_PROVIDER", "local"
+        )
         self.embedding_model = os.getenv(
             "CONTEXTSLIM_EMBEDDING_MODEL",
             "all-MiniLM-L6-v2",

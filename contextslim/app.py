@@ -6,7 +6,7 @@ from fastmcp import FastMCP
 
 from contextslim.config import Config
 from contextslim.catalog import ToolCatalog
-from contextslim.embeddings import EmbeddingService
+from contextslim.embeddings import EmbeddingService, OpenAIEmbedding
 from contextslim.registry import MCPServerRegistry
 from contextslim.services.indexing_service import IndexingService
 from contextslim.services.search_service import SearchService
@@ -21,7 +21,7 @@ logger = logging.getLogger("contextslim")
 config = Config()
 
 catalog = ToolCatalog(config.db_path)
-embeddings = EmbeddingService(config.embedding_model)
+embeddings = EmbeddingService.create(config.embedding_provider, config.embedding_model)
 registry = MCPServerRegistry(config.mcp_servers_path)
 analytics = AnalyticsService(config.db_path)
 
