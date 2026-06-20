@@ -993,23 +993,19 @@
     // Check auth on load
     window.addEventListener('DOMContentLoaded', () => {
       initIcons();
-      if (state.adminKey) {
-        // test auth by loading stats
-        loadDashboardData(true);
-      } else {
-        authOverlay.classList.remove('hidden');
-      }
+      // Try to load dashboard data on start. If it succeeds, it hides the auth overlay automatically.
+      loadDashboardData((success) => {
+        if (!success) {
+          authOverlay.classList.remove('hidden');
+        }
+      });
     });
 
     // Handle authentication UI
     authBtn.addEventListener('click', () => {
       const key = adminKeyInput.value.trim();
-      if (!key) {
-        authError.textContent = 'Please enter an admin key.';
-        return;
-      }
       state.adminKey = key;
-      loadDashboardData(false, (success) => {
+      loadDashboardData((success) => {
         if (success) {
           localStorage.setItem('contextslim_admin_key', key);
           authOverlay.classList.add('hidden');
@@ -1035,7 +1031,7 @@
     refreshBtn.addEventListener('click', () => {
       const refreshIcon = refreshBtn.querySelector('i');
       if (refreshIcon) refreshIcon.classList.add('spin-anim');
-      loadDashboardData(true, () => {
+      loadDashboardData(() => {
         if (refreshIcon) refreshIcon.classList.remove('spin-anim');
       });
     });
@@ -1068,7 +1064,7 @@
     });
 
     // Fetch dashboard stats from api
-    function loadDashboardData(hideAuthOverlayOnSuccess = false, callback = null) {
+    function loadDashboardData(callback = null) {
       const url = `/api/admin/stats?admin_key=${encodeURIComponent(state.adminKey)}`;
       
       fetch(url)
@@ -1078,9 +1074,7 @@
         })
         .then(data => {
           state.data = data;
-          if (hideAuthOverlayOnSuccess) {
-            authOverlay.classList.add('hidden');
-          }
+          authOverlay.classList.add('hidden');
           
           updateOverviewStats();
           updateSidebar();
@@ -1090,10 +1084,8 @@
         })
         .catch(err => {
           console.error(err);
+          authOverlay.classList.remove('hidden');
           if (callback) callback(false);
-          if (!hideAuthOverlayOnSuccess) {
-            authOverlay.classList.remove('hidden');
-          }
         });
     }
 
