@@ -82,6 +82,19 @@ class AnalyticsService:
             (user_id, user_email, session_id, action, str(details)),
         )
 
+    def log_audit(
+        self,
+        action: str,
+        details: dict,
+        user_id: Optional[str] = None,
+        user_email: Optional[str] = None,
+        session_id: Optional[str] = None,
+    ):
+        conn = self._get_conn()
+        self._log_audit(conn, user_id, user_email, session_id, action, details)
+        conn.commit()
+        conn.close()
+
     def get_usage_frequency(self, tool_id: str) -> float:
         conn = self._get_conn()
         row = conn.execute(
