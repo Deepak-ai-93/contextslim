@@ -1,5 +1,7 @@
 # ContextSlim MCP Router Server
 
+**Live instance:** [`https://contextslim.vercel.app`](https://contextslim.vercel.app) (MCP endpoint: `POST /mcp`)
+
 **ContextSlim** is an MCP-native tool routing layer that prevents context bloat by dynamically exposing only the most relevant MCP tools to the active agent.
 
 Instead of sending hundreds of tool schemas from dozens of MCP servers into every LLM request, ContextSlim acts as an intelligent MCP gateway that indexes all available tools, semantically searches descriptions, and returns only the most relevant subset — reducing token consumption and improving tool selection accuracy.
