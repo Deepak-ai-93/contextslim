@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: contextslim
+    env: python
+    buildCommand: pip install -r requirements.txt && python -c "from contextslim.embeddings import EmbeddingService; EmbeddingService('all-MiniLM-L6-v2').embed('warmup')"
+    startCommand: python -m contextslim.app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: HF_HUB_DISABLE_SYMLINKS_WARNING
+        value: "1"
+      - key: CONTEXTSLIM_API_KEY
+        sync: false
+      - key: CONTEXTSLIM_EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: CONTEXTSLIM_TOP_K
+        value: "20"
