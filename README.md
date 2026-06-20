@@ -20,6 +20,14 @@ python -m contextslim.app
    - Build Command: `pip install -r requirements.txt`
    - Start Command: `python -m contextslim.app`
 
+### Vercel
+
+1. Push this repo to GitHub
+2. In Vercel, import the repo
+3. Vercel will auto-detect `vercel.json`
+4. Requires **Pro plan** (Hobby plan has 50MB function limit; Python deps exceed this)
+5. Uses Streamable HTTP transport (no persistent SSE connections)
+
 ## Configuration
 
 | Variable | Default | Description |
